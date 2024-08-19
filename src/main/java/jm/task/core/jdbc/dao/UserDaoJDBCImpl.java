@@ -14,46 +14,66 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
-    public void createUsersTable() {
+    public void createUsersTable() throws SQLException {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate("CREATE TABLE users (\n" +
                     " id int not null auto_increment,\n" +
                     " name varchar(45) not null,\n" +
                     " lastname varchar(45) not null,\n" +
                     " age int not null,\n" +
                     " primary key (id))");
+            connection.commit();
         }catch (SQLException e) {
             e.printStackTrace();
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 
-    public void dropUsersTable() {
+    public void dropUsersTable() throws SQLException {
         try(Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate("DROP TABLE users");
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
 
     }
 
-    public void saveUser(String name, String lastName, byte age) {
+    public void saveUser(String name, String lastName, byte age) throws SQLException {
         try(PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(name, lastname, age) VALUES(?,?,?)")) {
+            connection.setAutoCommit(false);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
 
     }
 
-    public void removeUserById(long id) {
+    public void removeUserById(long id) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users WHERE id=?")){
+            connection.setAutoCommit(false);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
 
     }
@@ -71,11 +91,16 @@ public class UserDaoJDBCImpl implements UserDao {
         return userList;
     }
 
-    public void cleanUsersTable() {
+    public void cleanUsersTable() throws SQLException {
         try(Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate("DELETE FROM users");
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
 
     }
